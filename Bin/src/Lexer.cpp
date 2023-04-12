@@ -1,56 +1,80 @@
 #include <string>
 #include <iostream>
+#include <cctype>
 #include "../hdr/Token.h"
 #include "../hdr/Lexer.hpp"
-#include "Token.cpp"
-void lexer::Lex(std::string str, std::vector<Token> tokens)
+namespace lexer 
 {
-	std::string couple;
-	
+	std::vector<std::vector<Token>> output;
+	std::vector<Token> line;
+}
+void lexer::Lex(std::string str, std::vector<Token> &tokens)
+{
+	std::string couple = ""; 
 	for (int i = 0; i < str.length(); i++) 
-	{	//operators
+	{
 		switch (str[i])
 		{	
 			case '+':
-				tokens.emplace_back("operator","+");
+				lexer::SaveCouple(line, couple);
+				tokens.emplace_back("operator", "+");
 				break;
 			case '-':
+				lexer::SaveCouple(line, couple);
 				tokens.emplace_back("operator", "-");
-					break;
+				couple = "";
+				break;
 			case '*':
-				tokens.emplace_back("operator","*");
+				lexer::SaveCouple(line, couple);
+				tokens.emplace_back("operator", "*");
+				couple = "";
 					break;
 			case '/':
-				tokens.emplace_back("operator","/");
+				lexer::SaveCouple(line, couple);
+				tokens.emplace_back("operator", "/");
+				couple = "";
 					break;
 			case '(':
+				lexer::SaveCouple(line, couple);
 				tokens.emplace_back("operator", "(");
+				couple = "";
 					break;
 			case ')':
+				lexer::SaveCouple(line, couple);
 				tokens.emplace_back("operator", ")");
+				couple = "";
 					break;
 			case '^':
+				lexer::SaveCouple(line, couple);
 				tokens.emplace_back("operator", "^");
+				couple = "";
 					break;
 			case '%':
+				lexer::SaveCouple(line, couple);
 				tokens.emplace_back("operator", "%");
+				couple = "";
 					break;
 			case '!':
+				lexer::SaveCouple(line, couple);
 				tokens.emplace_back("operator", "!");
-
+				couple = "";
 					break;
 			case '=':
+				lexer::SaveCouple(line, couple);
 				tokens.emplace_back("operator", "=");
+				couple = "";
 					break;
-			case '~':
-				tokens.emplace_back("operator", "~");
-				break;
 			case '{':
+				lexer::SaveCouple(line, couple);
 				tokens.emplace_back("operator", "{");
+				couple = "";
 				break;
 			case '}':
+				lexer::SaveCouple(line, couple);
 				tokens.emplace_back("operator", "}");
+				couple = "";
 				break;
+
 			/*
 			*	literal string string: ignores operators literals
 			*	so:
@@ -58,45 +82,66 @@ void lexer::Lex(std::string str, std::vector<Token> tokens)
 			*	wouldn't be:
 			*	[literal:"a, operator:=, literal:b", ...]
 			*/
+			case '~':
+				lexer::Lexline(str, tokens, '~', "operation", i);
+					break;
 			case '\"':
-					for(int j=i; j<str.length(); j++)
-					{ 
-						couple += str[j];
-						if (str[j] == '\"') 
-						{
-							tokens.emplace_back("literal", couple);
-							couple = "";
-							i = j;
-							break;
-						}
-					}
-					//todo if not found found second "
+				lexer::Lexline(str, tokens, '\"', "literal", i);
+				break;
+					
 			default:
-				std::string numbers = "1234567890.";
-				if (str[i] = ' ' && couple != "")
+				if (couple != "" && str[i] == ' ')
 				{
-					bool testNum = true;
-					for (int j = 0; j < couple.length(); j++) {
-						if (!numbers.find(couple[j])) { testNum = false; }
-					}
-					if (couple == "True" || couple == "False" || testNum)
-					{
-						tokens.emplace_back("literal", couple);
-						couple = "";
-						break;
-					}
-					if (couple == "if" || couple == "else" || couple == "func" || couple == "print" || couple == "while" ||  couple == "let" || couple == "input")
-					{	
-						tokens.emplace_back("keyword", couple);
-						couple = "";
-						break;
-					}
-						
+					lexer::SaveCouple(line, couple);
 				}
-				if (couple = "" || str[i] != ' ' && couple != "")
-				{
-					couple += str[i];
-				}
+				couple += str[i];
 		}
 	}
+	lexer::SaveCouple(line, couple);
+}
+void lexer::Lexline(std::string str2, std::vector<Token> &tokens, char endchar, std::string type, int &beg) 
+{
+	bool isEnd = false;
+	std::string couple2 = "";
+	couple2+=endchar;
+	beg++;
+	
+	for (int j = beg; j < str2.length(); j++)
+	{
+		couple2 += str2[j];
+		if (str2[j] == endchar)
+		{
+			isEnd = true;
+			beg = j;
+			tokens.emplace_back(type, couple2);
+			break;
+		}
+	}
+	if(isEnd == false)
+	{
+		std::cout << "Err: expected " << endchar << " somewhere near [ " << str2 << " ]";
+		exit(-1);
+	}
+}
+void lexer::SaveCouple(std::vector<Token> &tokens, std::string &couple)
+{
+	bool testNum = true;
+	for (int j = 0; j < couple.length(); j++) {
+		if (!std::isdigit(couple[j]) || couple[j] == '.') { testNum = false; break; }
+	}
+	if (couple == "True" || couple == "False" || testNum == true)
+	{
+		tokens.emplace_back("literal", couple);
+		couple = "";
+		return;
+	}
+	if (couple == "if" || couple == "else" || couple == "func" || couple == "print" || couple == "while" || couple == "let" || couple == "input")
+	{
+		tokens.emplace_back("keyword", couple);
+		couple = "";
+		return;
+	}
+	tokens.emplace_back("name", couple);
+	couple = "";
+	return;
 }

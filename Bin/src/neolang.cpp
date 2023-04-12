@@ -13,19 +13,20 @@ int main()
 	std::cout << "Paste path where your file is:";
 	std::cin >> str;
 	std::ifstream programFile; programFile.open(str);
-	// lexer lexes whole file
+	
+	//lexer lexes whole file
 	std::string line;
+	std::getline(std::cin, line);
 	while (std::getline(programFile, line)) {
 		lexer::Lex(line, lexer::line);
+		for (int i = 0; i < lexer::line.size(); i++)
 		lexer::output.push_back(lexer::line);
 	}
-	std::cout << "{";
-	for (int i = 0; i < lexer::output.size(); i++) {
-		for (int j = 0; j < lexer::output[i].size(); j++) {
-			std::cout << lexer::output[i][j].type << ":" << lexer::output[i][j].value << ", ";
+	for (int j = 0; j < lexer::output.size(); j++) {
+		for (int i = 0; i < lexer::output[j].size(); i++) {
+			std::cout << lexer::output[j][i].type << " " << lexer::output[j][i].value << " , ";
 		}
 	}
-	std::cout << "}";
 	programFile.close();
 
 	return 0;
