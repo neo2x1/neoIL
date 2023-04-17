@@ -6,3 +6,6 @@ As the name sugests this is an interpreted language made in c++.
 - [ ] interpreter commands -- working on it 2/10
 - [ ] language's documentation
 - [ ] pb&j sandwich 
+
+Credits:
+Codeplea - tinyexpr
