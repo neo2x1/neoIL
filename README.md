@@ -3,7 +3,7 @@ NeoIL (Neo's Interpreted Language) is an project created for my school technical
 As the name sugests this is an interpreted language made in c++.
 # To-Do
 - [x] Lexer / tokenizer -- fixed and working flawlesly
-- [ ] interpreter commands -- working on it 2/10
+- [ ] interpreter commands -- working on it - left if and func
 - [ ] language's documentation
 - [ ] pb&j sandwich 
 
