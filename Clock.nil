@@ -1,0 +1,24 @@
+let h = ""
+let m = ""
+let s = ""
+input h
+input m
+input s
+let a = 1
+while a  =  1{
+    print h " " m " " s
+    s = ~s+1~
+    if s > 59 {
+        s = 0
+        m = ~m+1~
+    }
+    if m > 59 {
+        h = ~h+1~
+        m=0
+    }
+    if h>23{
+        h=0
+    }
+    delay 1
+    print clear
+}
